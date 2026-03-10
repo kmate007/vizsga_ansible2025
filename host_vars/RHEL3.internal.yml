@@ -1,0 +1,43 @@
+# az elavult dnsec letiltása mivel a role régebbi mint a használt bind
+bind_dnssec_enable: false
+bind_dnssec_validation: "auto"
+# itt az alhálózatokat adjuk eg ahonnan jöhet dns lekérdezés
+bind_allow_query:
+  - any
+# ez határozza meg mely interfacen (lehet any mert csak 1 interface van + a loopback)
+bind_listen_ipv4:
+  - any
+bind_forwarders:
+  - 8.8.8.8
+  - 1.1.1.1
+
+# Rekurzió engedélyezése a belső hálózatnak ITT MEG KELL ADNI AZ ÖSSZES BELSŐ HÁLÓZATOT AMI KIMEGY AZ INTERNETRE
+bind_recursion: yes
+bind_allow_recursion:
+  - 192.168.40.0/24
+
+
+bind_zones:
+  - name: server.internal
+    primaries: 
+      - 192.168.40.243
+    networks:
+      - 192.168.40
+    
+    # Rekordok listája
+    hosts:
+      - name: "@"              # Hivatkozás a server.internal-ra
+        ip: 192.168.40.242
+      - name: ns1
+        ip: 192.168.40.243    # a dns címe
+      - name: www
+        ip: 192.168.40.242
+
+      - name: RHEL1
+        ip: 192.168.40.241
+      - name: RHEL2
+        ip: 192.168.40.242
+      - name: RHEL3
+        ip: 192.168.40.243
+      - name: DEB
+        ip: 192.168.40.244

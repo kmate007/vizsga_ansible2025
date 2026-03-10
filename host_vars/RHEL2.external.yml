@@ -1,0 +1,5 @@
+# Apache beállítások
+apache_vhosts:
+  - servername: "RHEL2.server.internal"
+    serveralias: "www.RHEL2.server.internal"
+    documentroot: "/var/www/html"

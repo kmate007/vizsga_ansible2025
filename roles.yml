@@ -1,0 +1,6 @@
+---
+roles:
+  - name: bertvv.dhcp 
+  - name: geerlingguy.apache
+  - name: brunobenchimol.bind 
+  - name: geerlingguy.nfs

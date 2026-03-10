@@ -1,0 +1,66 @@
+---
+- name: DHCP szerver konfigurálása role segítségével
+  hosts: DHCP
+  pre_tasks:
+    - name: AppArmor telepítése (mivel a debian lxc-n nincs alapból de a bertvv.dhcp alapnak veszi)
+      ansible.builtin.package:
+        name: apparmor
+        state: latest
+  roles:
+    - role: bertvv.dhcp
+
+
+- name: DNS szerver konfigurálása role segítségével
+  hosts: DNS
+  roles:
+    - role: brunobenchimol.bind 
+  tasks:
+    - name: Tűzfal engedélyezés DNS 
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop:
+        - 53/udp
+        - 53/tcp
+
+
+- name: HTTPS szerver konfigurálása role segítségével
+  hosts: WEB
+  roles:
+    - role: geerlingguy.apache
+  tasks:
+    - name: Tűzfal engedélyezés HTTP
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop:
+        - 80/tcp
+
+
+- name: NFS Szerver konfigurálása role segítségével
+  hosts: FILE
+  pre_tasks:
+    - name: Megosztandó könyvtár létrehozása
+      ansible.builtin.file:
+        path: "/var/nfs/shared_data"
+        state: directory
+        mode: '0777'
+        owner: nobody
+        group: nobody
+  roles:
+    - role: geerlingguy.nfs
+  tasks:
+    - name: Tűzfal engedélyezés NFS
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop:
+        - nfs
+        - rpc-bind
+        - mountd

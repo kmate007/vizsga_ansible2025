@@ -1,0 +1,40 @@
+---
+all:
+  hosts:
+    RHEL1.internal:
+      ansible_host: 192.168.40.241
+    RHEL2.external:
+      ansible_host: 192.168.40.242
+    RHEL3.internal:
+      ansible_host: 192.168.40.243
+    DEB.internal:
+      ansible_host: 192.168.40.244
+  children:
+    RHEL:
+      hosts:
+        RHEL1.internal:
+        RHEL2.external:
+        RHEL3.internal:
+    DEB:
+      hosts:
+        DEB.internal:
+    EXT:
+      hosts:
+        RHEL2.external:
+    INT:
+      hosts:
+        RHEL1.internal:
+        RHEL3.internal:
+        DEB.internal:
+    FILE:
+      hosts:
+        RHEL1.internal:
+    WEB:
+      hosts:
+        RHEL2.external:
+    DNS:
+      hosts:
+        RHEL3.internal:
+    DHCP:
+      hosts:
+        DEB.internal:

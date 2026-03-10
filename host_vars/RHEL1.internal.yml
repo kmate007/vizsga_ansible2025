@@ -1,0 +1,3 @@
+#a megosztott mappa és hogy mely hálózatok férnek hozzá
+nfs_exports:
+  - "/var/nfs/shared_data 192.168.40.0/24(rw,sync,no_root_squash) 192.168.50.0/24(rw,sync,no_root_squash)"

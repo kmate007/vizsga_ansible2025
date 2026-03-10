@@ -1,0 +1,56 @@
+# DHCP globális beállítások
+dhcp_global_interfaces:
+  - eth0
+dhcp_global_domain_name: "DEB.internal"
+dhcp_global_domain_name_servers:
+  - 192.168.40.243
+  - 192.168.40.245
+# bérleti és maximális bérleti idő
+dhcp_global_default_lease_time: 600
+dhcp_global_max_lease_time: 7200
+
+# Alhálózatok definiálása
+dhcp_subnets:
+  - ip: 192.168.10.0
+    netmask: 255.255.255.0
+    routers: 192.168.10.1
+    domain_name_servers:
+      - 192.168.40.243
+      - 192.168.40.245
+
+    pools:
+      - range_begin: 192.168.10.10
+        range_end: 192.168.10.210
+
+
+  - ip: 192.168.20.0
+    netmask: 255.255.255.0
+    routers: 192.168.20.1
+    domain_name_servers:
+      - 192.168.40.243
+      - 192.168.40.245
+
+    pools:
+      - range_begin: 192.168.20.10
+        range_end: 192.168.20.100
+
+
+  - ip: 192.168.30.0
+    netmask: 255.255.255.0
+    routers: 192.168.30.1
+    domain_name_servers:
+      - 192.168.40.243
+      - 192.168.40.245
+
+    pools:
+      - range_begin: 192.168.30.10
+        range_end: 192.168.30.100
+
+
+# csak mert kötelező a saját hálózaton is osztani (40-es) 
+  - ip: 192.168.40.0
+    netmask: 255.255.255.0
+    routers: 192.168.40.1
+    domain_name_servers:
+      - 192.168.40.243
+      - 192.168.40.245 
