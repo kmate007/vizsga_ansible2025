@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # A Caddy web szerver indítása
+  web:
+    image: caddy:latest
+    container_name: caddy-server
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./html/index.html:/usr/share/caddy/index.html
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+  # A wireguard VPN indítása 
+  wg-easy:
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wg-easy
+    restart: unless-stopped
+    environment:
+      - WG_HOST=vizsga2026webserver.duckdns.org 
+      - PASSWORD_HASH=$$2a$$12$$Yx7qfzrNk7j8TKX6.ta5YebxLog62laieEZAxEK3uTzcvcy3Qy8Eq
+      - WG_DEFAULT_DNS=8.8.8.8
+      - WG_ALLOWED_IPS=0.0.0.0/0
+    volumes:
+      - ./etc_wireguard:/etc/wireguard
+    ports:
+      - "51820:51820/udp" # VPN port
+      - "51821:51821/tcp" # Web GUI port
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+
+volumes:
+  caddy_data:
+  caddy_config:

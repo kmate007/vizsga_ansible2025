@@ -26,19 +26,75 @@
         - 53/tcp
 
 
-- name: HTTPS szerver konfigurálása role segítségével
-  hosts: WEB
-  roles:
-    - role: geerlingguy.apache
+- name: Docker telepítése és HTTPS (Caddy) és VPN konténer indítása 
+  hosts: WEB 
+  vars:
+    docker_compose_dir: "/opt/docker"
+
   tasks:
-    - name: Tűzfal engedélyezés HTTP
-      ansible.posix.firewalld:
-        port: "{{ item }}"
-        permanent: true
-        state: enabled
-        immediate: true
-      loop:
-        - 80/tcp
+    - name: Szükséges segédprogramok telepítése (yum-utils)
+      ansible.builtin.package:
+        name: yum-utils
+        state: present
+
+    - name: iptables_nat betöltés a wireguardnak
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/iptable_nat.conf
+        content: "iptable_nat\n"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Modul azonnali betoltese (runtime)
+      community.general.modprobe:
+        name: iptable_nat
+        state: present
+
+    - name: Docker tároló hozzáadása
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Docker motor és CLI telepítése
+      ansible.builtin.package:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Docker szolgáltatás elindítása és engedélyezése
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Projekt könyvtár létrehozása a docker-compose számára
+      ansible.builtin.file:
+        path: "{{ docker_compose_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: docker-compose.yml másolása a szerverre
+      ansible.builtin.copy:
+        src: ./WEBsource/docker-compose.yml
+        dest: "{{ docker_compose_dir }}/docker-compose.yml"
+
+    - name: Caddy fájlok másolása
+      ansible.builtin.copy:
+        src: ./WEBsource/Caddyfile
+        dest: "{{ docker_compose_dir }}/Caddyfile"
+
+    - name: a webszerver html másolása
+      ansible.builtin.copy:
+        src: ./WEBsource/html/
+        dest: "{{ docker_compose_dir }}/html/"
+
+    - name: Konténerek indítása Docker Compose-al
+      ansible.builtin.command:
+        cmd: docker compose up -d
+        chdir: "{{ docker_compose_dir }}"
 
 
 - name: NFS Szerver konfigurálása role segítségével

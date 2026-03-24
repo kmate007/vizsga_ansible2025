@@ -1,0 +1,11 @@
+{
+    email kocsismate0072@gmail.com
+}
+
+vizsga2026webserver.duckdns.org {
+    # Itt mondod meg, hol vannak a weboldal fájljai a konténeren belül
+    root * /usr/share/caddy
+    
+    # Bekapcsolod a fájlkiszolgálót
+    file_server
+}
