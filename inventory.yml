@@ -9,6 +9,8 @@ all:
       ansible_host: 192.168.40.243
     DEB.internal:
       ansible_host: 192.168.40.244
+    SC.internal:
+      ansible_host: 192.168.40.249
   children:
     RHEL:
       hosts:

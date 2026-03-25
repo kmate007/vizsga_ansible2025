@@ -14,10 +14,6 @@ dhcp_subnets:
   - ip: 192.168.10.0
     netmask: 255.255.255.0
     routers: 192.168.10.1
-    domain_name_servers:
-      - 192.168.40.243
-      - 192.168.40.245
-
     pools:
       - range_begin: 192.168.10.10
         range_end: 192.168.10.210
@@ -26,10 +22,6 @@ dhcp_subnets:
   - ip: 192.168.20.0
     netmask: 255.255.255.0
     routers: 192.168.20.1
-    domain_name_servers:
-      - 192.168.40.243
-      - 192.168.40.245
-
     pools:
       - range_begin: 192.168.20.10
         range_end: 192.168.20.100
@@ -38,10 +30,6 @@ dhcp_subnets:
   - ip: 192.168.30.0
     netmask: 255.255.255.0
     routers: 192.168.30.1
-    domain_name_servers:
-      - 192.168.40.243
-      - 192.168.40.245
-
     pools:
       - range_begin: 192.168.30.10
         range_end: 192.168.30.100
@@ -51,6 +39,41 @@ dhcp_subnets:
   - ip: 192.168.40.0
     netmask: 255.255.255.0
     routers: 192.168.40.1
-    domain_name_servers:
-      - 192.168.40.243
-      - 192.168.40.245 
+#    pools:
+#      - range_begin: 192.168.40.22
+#        range_end: 192.168.40.100
+
+
+# A role-nak jelezzük, hogy akarunk IPv6-ot is
+dhcp_global_enable_ipv6: true
+dhcp_global_ipv6_interface: eth0
+
+# globális dns
+dhcp_global_additional_options_v6:
+  - "option dhcp6.name-servers 2001:4C48:1234:40::243, 2001:4C48:1234:40::245"
+
+# IPv6 Alhálózatok definiálása
+dhcp_subnets_v6:
+  - ip: "2001:4C48:1234:10::"
+    netmask: 64
+    pools:
+      - range_begin: "2001:4C48:1234:10::10"
+        range_end: "2001:4C48:1234:10::210"
+
+  - ip: "2001:4C48:1234:20::"
+    netmask: 64
+    pools:
+      - range_begin: "2001:4C48:1234:20::10"
+        range_end: "2001:4C48:1234:20::100"
+
+  - ip: "2001:4C48:1234:30::"
+    netmask: 64
+    pools:
+      - range_begin: "2001:4C48:1234:30::10"
+        range_end: "2001:4C48:1234:30::100"
+
+  - ip: "2001:4C48:1234:40::"
+    netmask: 64
+#    pools:
+#      - range_begin: "2001:4c48:1234:40::22"
+#        range_end: "2001:4c48:1234:40::50"

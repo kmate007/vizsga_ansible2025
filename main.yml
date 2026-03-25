@@ -9,9 +9,60 @@
   roles:
     - role: bertvv.dhcp
 
+- name: A szuper számítógép konfigurálása mqtt brókernek
+  hosts: SC.internal
+  tasks:
+    - name: EPEL telepítése mivel ebben van a mosquitto
+      ansible.builtin.package:
+        name: epel-release
+        state: latest
+
+    - name: Mosquitto telepítése 
+      ansible.builtin.package:
+        name: 
+          - mosquitto
+        state: latest
+        enablerepo: epel
+        update_cache: yes
+
+    - name: A mosquitto konfihurációs fájljának felmásolása
+      ansible.builtin.copy:
+        src: "./SCconf/mosquitto.conf"
+        dest: "/etc/mosquitto/mosquitto.conf"
+
+    - name: A mosquitto elindítása
+      ansible.builtin.systemd:
+        name: mosquitto
+        state: started
+        enabled: yes
+
+    - name: Tűzfal engedélyezés DNS 
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop:
+        - 1883/tcp
 
 - name: DNS szerver konfigurálása role segítségével
   hosts: DNS
+  pre_tasks:
+    - name: BIND és OpenSSL könyvtárak kényszerített frissítése a függőségi  hiba javításához
+      ansible.builtin.dnf:
+        name:
+          - bind-libs
+          - bind-utils
+          - openssl-libs
+          - openssl
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+      register: repair_result
+
+    - name: DNF gyorsítótár ürítése (ha volt frissítés)
+      ansible.builtin.command: dnf clean all
+      when: repair_result.changed
   roles:
     - role: brunobenchimol.bind 
   tasks:
